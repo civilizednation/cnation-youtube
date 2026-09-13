@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import "./globals.css";
+import pkg from "../package.json";
 
 export default function Home() {
   const [url, setUrl] = useState("");
@@ -48,6 +49,7 @@ export default function Home() {
 
   return (
     <main className="page">
+      <div className="version-badge">v{pkg.version}</div>
       <div className="card">
         <div className="logo">
           <div className="logo-badge">CN</div>
