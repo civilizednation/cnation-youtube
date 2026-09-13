@@ -1,90 +1,106 @@
-import ytdl from "@distube/ytdl-core";
+import youtubeDl from "youtube-dl-exec";
 import ffmpegPath from "ffmpeg-static";
-import ffmpeg from "fluent-ffmpeg";
-import { PassThrough, Readable } from "stream";
+import { spawn } from "child_process";
+import { createReadStream, existsSync } from "fs";
+import { unlink, stat } from "fs/promises";
+import { randomUUID } from "crypto";
+import os from "os";
+import path from "path";
+import { Readable } from "stream";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
-ffmpeg.setFfmpegPath(ffmpegPath);
+const YT_URL_RE = /^(https?:\/\/)?([\w-]+\.)?(youtube\.com|youtu\.be)\//i;
+const YT_DLP_PATH = youtubeDl.constants.YOUTUBE_DL_PATH;
+
+function runYtDlp(args) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(YT_DLP_PATH, args);
+    let stderr = "";
+    child.stderr.on("data", (chunk) => {
+      stderr += chunk.toString();
+    });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(stderr.slice(-2000) || `yt-dlp exited with ${code}`));
+    });
+  });
+}
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const url = searchParams.get("url");
   const itag = searchParams.get("itag");
+  const muxed = searchParams.get("muxed") === "1";
+  const rawTitle = searchParams.get("title") || "download";
 
-  if (!url || !ytdl.validateURL(url)) {
+  if (!url || !YT_URL_RE.test(url)) {
     return Response.json(
       { error: "유효한 유튜브 링크를 입력해 주세요." },
       { status: 400 }
     );
   }
 
+  const isAudio = itag === "mp3";
+  const ext = isAudio ? "mp3" : "mp4";
+  const safeTitle = rawTitle.replace(/[\\/:*?"<>|]/g, "_").slice(0, 100) || "download";
+  const id = randomUUID();
+  const tmpDir = os.tmpdir();
+  const outputTemplate = path.join(/* turbopackIgnore: true */ tmpDir, `${id}.%(ext)s`);
+  const finalPath = path.join(/* turbopackIgnore: true */ tmpDir, `${id}.${ext}`);
+
+  const args = [
+    url,
+    "-o",
+    outputTemplate,
+    "--ffmpeg-location",
+    ffmpegPath,
+    "--no-playlist",
+    "--no-warnings",
+    "--no-part",
+  ];
+
+  if (isAudio) {
+    args.push("-f", "bestaudio/best", "-x", "--audio-format", "mp3");
+  } else if (itag) {
+    const selector = muxed ? itag : `${itag}+bestaudio/${itag}/best`;
+    args.push("-f", selector, "--merge-output-format", "mp4");
+  } else {
+    args.push("-f", "bestvideo+bestaudio/best", "--merge-output-format", "mp4");
+  }
+
   try {
-    const info = await ytdl.getInfo(url);
-    const safeTitle = info.videoDetails.title
-      .replace(/[\\/:*?"<>|]/g, "_")
-      .slice(0, 100);
+    await runYtDlp(args);
 
-    if (itag === "mp3") {
-      const audioFormat = ytdl.chooseFormat(info.formats, {
-        quality: "highestaudio",
-        filter: "audioonly",
-      });
-
-      if (!audioFormat) {
-        return Response.json(
-          { error: "오디오를 찾을 수 없습니다." },
-          { status: 404 }
-        );
-      }
-
-      const audioStream = ytdl.downloadFromInfo(info, { format: audioFormat });
-      const output = new PassThrough();
-
-      ffmpeg(audioStream)
-        .audioBitrate(192)
-        .format("mp3")
-        .on("error", () => output.destroy())
-        .pipe(output, { end: true });
-
-      const webStream = Readable.toWeb(output);
-
-      return new Response(webStream, {
-        headers: {
-          "Content-Type": "audio/mpeg",
-          "Content-Disposition": `attachment; filename="${encodeURIComponent(
-            safeTitle
-          )}.mp3"`,
-        },
-      });
-    }
-
-    const format = itag
-      ? info.formats.find((f) => String(f.itag) === String(itag))
-      : ytdl.chooseFormat(info.formats, { quality: "highest" });
-
-    if (!format) {
+    if (!existsSync(finalPath)) {
       return Response.json(
-        { error: "요청한 화질을 찾을 수 없습니다." },
-        { status: 404 }
+        { error: "다운로드된 파일을 찾을 수 없습니다." },
+        { status: 500 }
       );
     }
 
-    const ext = format.container || "mp4";
-    const nodeStream = ytdl.downloadFromInfo(info, { format });
+    const fileStat = await stat(finalPath);
+    const nodeStream = createReadStream(finalPath);
+    nodeStream.on("close", () => {
+      unlink(finalPath).catch(() => {});
+    });
+
     const webStream = Readable.toWeb(nodeStream);
 
     return new Response(webStream, {
       headers: {
-        "Content-Type": format.mimeType?.split(";")[0] || "video/mp4",
+        "Content-Type": isAudio ? "audio/mpeg" : "video/mp4",
+        "Content-Length": String(fileStat.size),
         "Content-Disposition": `attachment; filename="${encodeURIComponent(
           safeTitle
         )}.${ext}"`,
       },
     });
   } catch (err) {
+    unlink(finalPath).catch(() => {});
     return Response.json(
       { error: "다운로드 중 오류가 발생했습니다." },
       { status: 500 }

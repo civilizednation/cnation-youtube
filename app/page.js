@@ -30,9 +30,15 @@ export default function Home() {
   }
 
   function handleDownload() {
-    if (!itag) return;
-    const downloadUrl = `/api/download?url=${encodeURIComponent(url)}&itag=${itag}`;
-    window.location.href = downloadUrl;
+    if (!itag || !info) return;
+    const format = info.formats.find((f) => String(f.itag) === itag);
+    const params = new URLSearchParams({
+      url,
+      itag,
+      muxed: format?.muxed ? "1" : "0",
+      title: info.title || "download",
+    });
+    window.location.href = `/api/download?${params.toString()}`;
   }
 
   return (
