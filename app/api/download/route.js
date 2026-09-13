@@ -1,4 +1,3 @@
-import youtubeDl from "youtube-dl-exec";
 import ffmpegPath from "ffmpeg-static";
 import { spawn } from "child_process";
 import { createReadStream, existsSync } from "fs";
@@ -13,7 +12,7 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 const YT_URL_RE = /^(https?:\/\/)?([\w-]+\.)?(youtube\.com|youtu\.be)\//i;
-const YT_DLP_PATH = youtubeDl.constants.YOUTUBE_DL_PATH;
+const YT_DLP_PATH = path.join(/* turbopackIgnore: true */ process.cwd(), "bin", "yt-dlp");
 
 function runYtDlp(args) {
   return new Promise((resolve, reject) => {

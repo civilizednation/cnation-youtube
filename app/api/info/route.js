@@ -1,12 +1,12 @@
-import youtubeDl from "youtube-dl-exec";
 import ffmpegPath from "ffmpeg-static";
 import { spawn } from "child_process";
+import path from "path";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const YT_URL_RE = /^(https?:\/\/)?([\w-]+\.)?(youtube\.com|youtu\.be)\//i;
-const YT_DLP_PATH = youtubeDl.constants.YOUTUBE_DL_PATH;
+const YT_DLP_PATH = path.join(/* turbopackIgnore: true */ process.cwd(), "bin", "yt-dlp");
 
 function fetchInfo(url) {
   return new Promise((resolve, reject) => {
