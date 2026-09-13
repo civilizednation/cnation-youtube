@@ -21,8 +21,11 @@ async function main() {
     throw new Error(`GitHub release lookup failed: ${releaseRes.status} ${body}`);
   }
   const release = await releaseRes.json();
-  const asset = release.assets.find((a) => a.name === "yt-dlp");
-  if (!asset) throw new Error("Could not find yt-dlp linux binary in latest release");
+  // yt-dlp_linux is the standalone PyInstaller build with Python bundled in;
+  // the plain "yt-dlp" asset is a Python zipapp that needs a system python3,
+  // which Vercel's Node runtime doesn't have.
+  const asset = release.assets.find((a) => a.name === "yt-dlp_linux");
+  if (!asset) throw new Error("Could not find yt-dlp_linux binary in latest release");
 
   console.log(
     `[prepare-bin] Downloading yt-dlp ${release.tag_name} from ${asset.browser_download_url}`
