@@ -60,6 +60,11 @@ export async function GET(request) {
     "--no-playlist",
     "--no-warnings",
     "--no-part",
+    // Same non-PO-token clients as /api/info, so both calls see the same formats.
+    "--extractor-args",
+    "youtube:player_client=tv_simply,tv,web_embedded,ios,android_vr",
+    "--extractor-retries",
+    "3",
   ];
 
   if (isAudio) {

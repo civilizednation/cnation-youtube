@@ -14,10 +14,15 @@ function fetchInfo(url) {
       url,
       "--dump-single-json",
       "--no-warnings",
-      "--no-call-home",
       "--no-check-certificate",
       "--prefer-free-formats",
       "--no-playlist",
+      // These clients don't require a proof-of-origin token, unlike the
+      // default web client, which YouTube bot-walls from datacenter IPs.
+      "--extractor-args",
+      "youtube:player_client=tv_simply,tv,web_embedded,ios,android_vr",
+      "--extractor-retries",
+      "3",
       "--ffmpeg-location",
       ffmpegPath,
     ];
