@@ -22,10 +22,15 @@ body {
   position: fixed;
   top: 10px;
   right: 14px;
-  font-size: 0.7rem;
-  color: #6f6f6f;
+  padding: 3px 9px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #fff;
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 999px;
   font-variant-numeric: tabular-nums;
-  z-index: 10;
+  z-index: 1000;
 }
 
 .card {

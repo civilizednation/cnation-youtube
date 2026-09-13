@@ -1,13 +1,14 @@
 {
   "name": "cnation-youtube-downloader",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "private": true,
   "engines": {
     "node": ">=20.9.0"
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "prepare-binaries": "node node_modules/ffmpeg-static/install.js && node node_modules/youtube-dl-exec/scripts/postinstall.js",
+    "build": "npm run prepare-binaries && next build",
     "start": "next start",
     "lint": "next lint"
   },
