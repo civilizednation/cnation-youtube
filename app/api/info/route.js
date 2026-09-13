@@ -1,10 +1,49 @@
 import youtubeDl from "youtube-dl-exec";
 import ffmpegPath from "ffmpeg-static";
+import { spawn } from "child_process";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const YT_URL_RE = /^(https?:\/\/)?([\w-]+\.)?(youtube\.com|youtu\.be)\//i;
+const YT_DLP_PATH = youtubeDl.constants.YOUTUBE_DL_PATH;
+
+function fetchInfo(url) {
+  return new Promise((resolve, reject) => {
+    const args = [
+      url,
+      "--dump-single-json",
+      "--no-warnings",
+      "--no-call-home",
+      "--no-check-certificate",
+      "--prefer-free-formats",
+      "--no-playlist",
+      "--ffmpeg-location",
+      ffmpegPath,
+    ];
+    const child = spawn(YT_DLP_PATH, args);
+    let stdout = "";
+    let stderr = "";
+    child.stdout.on("data", (chunk) => {
+      stdout += chunk.toString();
+    });
+    child.stderr.on("data", (chunk) => {
+      stderr += chunk.toString();
+    });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      if (code !== 0) {
+        reject(new Error(stderr.slice(-1500) || `yt-dlp exited with code ${code}`));
+        return;
+      }
+      try {
+        resolve(JSON.parse(stdout));
+      } catch (e) {
+        reject(new Error(`JSON parse failed: ${stdout.slice(-500)}`));
+      }
+    });
+  });
+}
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -18,15 +57,7 @@ export async function GET(request) {
   }
 
   try {
-    const info = await youtubeDl(url, {
-      dumpSingleJson: true,
-      noWarnings: true,
-      noCallHome: true,
-      noCheckCertificate: true,
-      preferFreeFormats: true,
-      noPlaylist: true,
-      ffmpegLocation: ffmpegPath,
-    });
+    const info = await fetchInfo(url);
 
     const videoFormats = (info.formats || []).filter(
       (f) => f.vcodec && f.vcodec !== "none" && f.ext === "mp4" && f.height
@@ -78,7 +109,7 @@ export async function GET(request) {
     });
   } catch (err) {
     console.error("yt-dlp info failed:", err);
-    const detail = (err?.stderr || err?.message || "").toString().slice(-800);
+    const detail = (err?.message || "").toString().slice(-800);
     return Response.json(
       {
         error: "영상 정보를 가져오지 못했습니다. 링크를 확인해 주세요.",
