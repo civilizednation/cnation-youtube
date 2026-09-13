@@ -101,8 +101,10 @@ export async function GET(request) {
     });
   } catch (err) {
     unlink(finalPath).catch(() => {});
+    console.error("yt-dlp download failed:", err);
+    const detail = (err?.message || "").toString().slice(-800);
     return Response.json(
-      { error: "다운로드 중 오류가 발생했습니다." },
+      { error: "다운로드 중 오류가 발생했습니다.", detail },
       { status: 500 }
     );
   }

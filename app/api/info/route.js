@@ -77,8 +77,13 @@ export async function GET(request) {
       formats: [...uniqueFormats, ...audioFormats],
     });
   } catch (err) {
+    console.error("yt-dlp info failed:", err);
+    const detail = (err?.stderr || err?.message || "").toString().slice(-800);
     return Response.json(
-      { error: "영상 정보를 가져오지 못했습니다. 링크를 확인해 주세요." },
+      {
+        error: "영상 정보를 가져오지 못했습니다. 링크를 확인해 주세요.",
+        detail,
+      },
       { status: 500 }
     );
   }

@@ -9,16 +9,21 @@ export default function Home() {
   const [itag, setItag] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [errorDetail, setErrorDetail] = useState("");
 
   async function handleAnalyze(e) {
     e.preventDefault();
     setError("");
+    setErrorDetail("");
     setInfo(null);
     setLoading(true);
     try {
       const res = await fetch(`/api/info?url=${encodeURIComponent(url)}`);
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "영상 정보를 가져오지 못했습니다.");
+      if (!res.ok) {
+        setErrorDetail(data.detail || "");
+        throw new Error(data.error || "영상 정보를 가져오지 못했습니다.");
+      }
       if (!data.formats?.length) throw new Error("다운로드 가능한 화질을 찾지 못했습니다.");
       setInfo(data);
       setItag(String(data.formats[0].itag));
@@ -65,7 +70,16 @@ export default function Home() {
           </button>
         </form>
 
-        {error && <div className="error">{error}</div>}
+        {error && (
+          <div className="error">
+            {error}
+            {errorDetail && (
+              <div style={{ marginTop: 8, fontSize: "0.75rem", opacity: 0.8, whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
+                {errorDetail}
+              </div>
+            )}
+          </div>
+        )}
 
         {info && (
           <div className="result">
