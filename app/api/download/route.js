@@ -67,6 +67,10 @@ export async function GET(request) {
     "3",
   ];
 
+  if (process.env.YTDLP_PROXY) {
+    args.push("--proxy", process.env.YTDLP_PROXY);
+  }
+
   if (isAudio) {
     args.push("-f", "bestaudio/best", "-x", "--audio-format", "mp3");
   } else if (itag) {

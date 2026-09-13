@@ -21,6 +21,20 @@ Vercel에 이 저장소를 연결하면 Next.js 프로젝트로 자동 인식되
 
 토큰 발급: GitHub → Settings → Developer settings → Personal access tokens → Generate new token (Fine-grained, 아무 리포지토리 권한도 선택하지 않아도 됩니다) → 생성된 값을 위 환경 변수에 붙여넣기 → 재배포.
 
+## 유튜브 봇 차단 우회 (중요)
+
+유튜브는 Vercel을 포함한 모든 클라우드/데이터센터 IP를 봇으로 의심해 차단합니다
+(`Sign in to confirm you're not a bot`). 이는 코드나 옵션으로 해결할 수 없고, 가정용
+IP를 경유해야만 통과됩니다.
+
+주거용(residential) 프록시를 사용하려면 Vercel 환경 변수에 아래를 추가하세요.
+
+| 이름 | 값 예시 |
+| --- | --- |
+| `YTDLP_PROXY` | `http://아이디:비밀번호@프록시주소:포트` |
+
+설정하지 않으면 프록시 없이 동작합니다(= 현재처럼 봇 차단에 걸릴 수 있음).
+
 ## 기능
 
 - 유튜브 링크 입력 → 해상도별 mp4 다운로드 (고화질 영상은 서버에서 영상/오디오를 자동 병합)

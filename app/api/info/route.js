@@ -26,6 +26,12 @@ function fetchInfo(url) {
       "--ffmpeg-location",
       ffmpegPath,
     ];
+
+    // YouTube bot-walls datacenter IPs regardless of client or flags, so a
+    // residential proxy is the only server-side way through.
+    if (process.env.YTDLP_PROXY) {
+      args.push("--proxy", process.env.YTDLP_PROXY);
+    }
     const child = spawn(YT_DLP_PATH, args);
     let stdout = "";
     let stderr = "";
