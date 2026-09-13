@@ -1,0 +1,10 @@
+{
+  "id": "/", "name": "cnation 유투브 다운로더", "short_name": "cnation 유투브 다운로더",
+  "description": "원하는 화질로 영상을 저장하는 개인용 웹앱",
+  "lang": "ko", "start_url": "/", "scope": "/", "display": "standalone",
+  "background_color": "#11151c", "theme_color": "#11151c",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

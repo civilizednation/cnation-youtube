@@ -1,21 +1,30 @@
 {
   "name": "cnation-youtube-downloader",
-  "version": "1.0.7",
+  "version": "1.0.0",
   "private": true,
-  "engines": {
-    "node": ">=20.9.0"
-  },
+  "engines": { "node": ">=22.0.0" },
   "scripts": {
-    "dev": "next dev",
-    "prepare-binaries": "node node_modules/ffmpeg-static/install.js && node scripts/prepare-bin.js",
-    "build": "npm run prepare-binaries && next build",
-    "start": "next start",
-    "lint": "next lint"
+    "dev": "next dev --hostname 127.0.0.1",
+    "build": "next build",
+    "start": "next start --hostname 127.0.0.1",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test --test-isolation=none tests/*.test.mjs",
+    "test:worker": "python -m unittest discover -s tests -p test_*.py",
+    "test:browser": "playwright test",
+    "secrets": "node scripts/generate-secrets.mjs"
   },
   "dependencies": {
-    "ffmpeg-static": "^5.3.0",
-    "next": "^16.3.5",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "@vercel/blob": "2.8.0",
+    "@vercel/sandbox": "3.3.0",
+    "next": "16.3.5",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.9.0"
   }
 }

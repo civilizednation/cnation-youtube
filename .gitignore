@@ -1,6 +1,12 @@
-node_modules
-.next
-/bin
-.env*.local
-npm-debug.log*
+node_modules/
+.next/
+.vercel/
+.env*
+!.env.example
+.sites-runtime/
+test-results/
+playwright-report/
+__pycache__/
+*.pyc
+*.tsbuildinfo
 .DS_Store
