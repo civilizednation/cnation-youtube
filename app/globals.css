@@ -69,6 +69,136 @@ body {
   margin: 0 0 20px;
 }
 
+.callout {
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: #17232e;
+  border: 1px solid #24384a;
+  color: #b8d4e8;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.callout.subtle {
+  background: #161616;
+  border-color: #2c2c2c;
+  color: #9a9a9a;
+  margin-top: 24px;
+}
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.step-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 6px;
+}
+
+.step-num {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #ff0033;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.step-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.step-body {
+  margin: 0 0 10px;
+  padding-left: 31px;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: #9a9a9a;
+}
+
+.cmd {
+  margin-left: 31px;
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  background: #1a1a1a;
+  border: 1px solid #2c2c2c;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.cmd code {
+  flex: 1;
+  padding: 12px 14px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: #e8e8e8;
+  word-break: break-all;
+  white-space: pre-wrap;
+}
+
+.cmd-copy {
+  flex-shrink: 0;
+  padding: 0 14px;
+  border: none;
+  border-left: 1px solid #2c2c2c;
+  background: #262626;
+  color: #cfcfcf;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.disclosure {
+  width: 100%;
+  margin-top: 24px;
+  padding: 12px 14px;
+  text-align: left;
+  background: transparent;
+  border: 1px solid #2c2c2c;
+  border-radius: 10px;
+  color: #9a9a9a;
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.web-section {
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid #2c2c2c;
+  border-radius: 10px;
+  background: #131313;
+}
+
+.web-section .step-body {
+  padding-left: 0;
+  margin-bottom: 14px;
+}
+
+.error-detail {
+  margin-top: 8px;
+  font-size: 0.72rem;
+  opacity: 0.8;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
 form {
   display: flex;
   flex-direction: column;
